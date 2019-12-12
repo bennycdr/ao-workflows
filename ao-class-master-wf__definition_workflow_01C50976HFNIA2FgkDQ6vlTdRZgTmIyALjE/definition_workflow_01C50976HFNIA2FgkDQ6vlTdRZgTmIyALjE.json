@@ -1,0 +1,525 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_01C50976HFNIA2FgkDQ6vlTdRZgTmIyALjE",
+    "name": "bemiles-MASTER",
+    "title": "bemiles-MASTER",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "bret",
+          "scope": "input",
+          "name": "name",
+          "type": "datatype.string",
+          "is_required": true
+        },
+        "unique_name": "variable_workflow_01C50BL3VPIBZ15ADTN0t6S8t5PdpBnlSax",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "local",
+          "name": "results",
+          "type": "datatype.string",
+          "is_required": false
+        },
+        "unique_name": "variable_workflow_01C50RGLWCD390fBOZdVlKFwL8ohsHAVC0r",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "is_atomic": false
+      },
+      "delete_workflow_instance": false,
+      "display_name": "bemiles-MASTER",
+      "runtime_user": {
+        "override_target_runtime_user": false,
+        "specify_on_workflow_start": false,
+        "target_default": true
+      },
+      "target": {
+        "target_type": "web-service.endpoint",
+        "target_id": "definition_target_01C4Y1W7QU1SN6jYxIcF6c5EijAXuJRNspD",
+        "execute_on_workflow_target": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_01C509Y4QPEUR2wk6LwcvWZk74KaGvroXLr",
+        "name": "bemiles-Query JSONPlaceHolder",
+        "title": "bemiles-Query JSONPlaceHolder",
+        "type": "workflow.atomic_workflow",
+        "base_type": "subworkflow",
+        "properties": {
+          "display_name": "bemiles-Query JSONPlaceHolder",
+          "input": {
+            "variable_workflow_01C4ZV7SDX2G81kb9t4gdWa7yZRZZq08cA6": "Users"
+          },
+          "runtime_user": {
+            "target_default": true
+          },
+          "target": {
+            "execute_on_this_target": true,
+            "target_id": "definition_target_01C4Y1W7QU1SN6jYxIcF6c5EijAXuJRNspD",
+            "target_type": "web-service.endpoint"
+          },
+          "workflow_id": "definition_workflow_01C4ZMZX0LH1O6E21Xo7QwpAMr1oaOZD9RW"
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01C50CRIS6XDT4CC0DZ2DVRgSBykCANrfUo",
+        "name": "JSONPath Query",
+        "title": "Get Information Out",
+        "type": "corejava.jsonpathquery",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": true,
+          "display_name": "Get Information Out",
+          "input_json": "$activity.definition_activity_01C509Y4QPEUR2wk6LwcvWZk74KaGvroXLr.output.variable_workflow_01C4ZVUB5386T1KUgIBqsFdB0pEc8b6Y49G$",
+          "jsonpath_queries": [
+            {
+              "jsonpath_query": "$.[?(@.username==\"$workflow.definition_workflow_01C50976HFNIA2FgkDQ6vlTdRZgTmIyALjE.input.variable_workflow_01C50BL3VPIBZ15ADTN0t6S8t5PdpBnlSax$\")]",
+              "jsonpath_query_name": "name",
+              "jsonpath_query_type": "string"
+            }
+          ],
+          "skip_execution": false
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01C50HRQNPV9Q0EvvnESbW9qoXMNBMb5grJ",
+        "name": "Execute Python Script",
+        "title": "Run Python Script",
+        "type": "python3.script",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "display_name": "Run Python Script",
+          "script": "import json\nimport sys\nblock = json.loads(sys.argv[1])\nif block['name']:\n  output = block['name']\nelse:\n  output = \"No Name Found.\"",
+          "script_arguments": [
+            "$activity.definition_activity_01C50CRIS6XDT4CC0DZ2DVRgSBykCANrfUo.output.jsonpath_queries.name$"
+          ],
+          "script_queries": [
+            {
+              "script_query": "output",
+              "script_query_name": "name_of_person",
+              "script_query_type": "string"
+            }
+          ],
+          "skip_execution": false
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_01C50NN7IO88A6kYGWdFaKN4l4agUjJr52b",
+        "name": "Condition Block",
+        "title": "if name found",
+        "type": "logic.if_else",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "if name found",
+          "skip_execution": false
+        },
+        "object_type": "definition_activity",
+        "blocks": [
+          {
+            "unique_name": "definition_activity_01C50NN91MKQ62Ky1wLeubhacbEdtMx21KD",
+            "name": "Condition Branch",
+            "title": "THEN",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$activity.definition_activity_01C50CRIS6XDT4CC0DZ2DVRgSBykCANrfUo.output.succeeded$",
+                "operator": "eq",
+                "right_operand": true
+              },
+              "continue_on_failure": false,
+              "display_name": "THEN",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_01C51FSYV23SB5jFdLgYZwcAe8uZlOE1i5B",
+                "name": "Group",
+                "title": "Found User Output",
+                "type": "logic.group",
+                "base_type": "activity",
+                "properties": {
+                  "continue_on_failure": false,
+                  "display_name": "Found User Output",
+                  "skip_execution": false
+                },
+                "object_type": "definition_activity",
+                "actions": [
+                  {
+                    "unique_name": "definition_activity_01C50RMVTW0VH5kYNeR4DNLZRCCZ0iTJhD0",
+                    "name": "Set Variables",
+                    "title": "Found User",
+                    "type": "core.set_multiple_variables",
+                    "base_type": "activity",
+                    "properties": {
+                      "continue_on_failure": false,
+                      "display_name": "Found User",
+                      "skip_execution": false,
+                      "variables_to_update": [
+                        {
+                          "variable_to_update": "$workflow.definition_workflow_01C50976HFNIA2FgkDQ6vlTdRZgTmIyALjE.local.variable_workflow_01C50RGLWCD390fBOZdVlKFwL8ohsHAVC0r$",
+                          "variable_value_new": "We found $activity.definition_activity_01C50HRQNPV9Q0EvvnESbW9qoXMNBMb5grJ.output.script_queries.name_of_person$ by username."
+                        }
+                      ]
+                    },
+                    "object_type": "definition_activity"
+                  },
+                  {
+                    "unique_name": "definition_activity_01C5108PPHH3R3hVhbxaIUOy92YkJM1PTOh",
+                    "name": "Write File",
+                    "title": "Write Results to Windows",
+                    "type": "windows.write_file",
+                    "base_type": "activity",
+                    "properties": {
+                      "action_timeout": 180,
+                      "continue_on_failure": false,
+                      "display_name": "Write Results to Windows",
+                      "encoding": "utf-8",
+                      "file_content": "$workflow.definition_workflow_01C50976HFNIA2FgkDQ6vlTdRZgTmIyALjE.local.variable_workflow_01C50RGLWCD390fBOZdVlKFwL8ohsHAVC0r$",
+                      "file_name_with_path": "e:\\ao\\bemiles-basic-workflow-results.txt",
+                      "options": "AEF",
+                      "runtime_user": {
+                        "override_target_runtime_user": false,
+                        "target_default": true
+                      },
+                      "skip_execution": false,
+                      "target": {
+                        "override_workflow_target": true,
+                        "target_id": "definition_target_01C5136CK5BRM6NoOJxGsxkQCPv63lsVYRr"
+                      }
+                    },
+                    "object_type": "definition_activity"
+                  },
+                  {
+                    "unique_name": "definition_activity_01C517P0TX8UP7EfNwOkleprujdo0RRSnTe",
+                    "name": "Write File",
+                    "title": "Write File to Master Node",
+                    "type": "terminal.write_file",
+                    "base_type": "activity",
+                    "properties": {
+                      "action_timeout": 180,
+                      "continue_on_failure": false,
+                      "display_name": "Write File to Master Node",
+                      "encoding": "utf-8",
+                      "file_name": "/root/bemiles-results.txt",
+                      "options": "append",
+                      "runtime_user": {
+                        "override_target_runtime_user": false,
+                        "target_default": true
+                      },
+                      "skip_execution": false,
+                      "target": {
+                        "override_workflow_target": true,
+                        "target_id": "definition_target_01C51DQGYX5QO0HnyjU6aMfIl2VUzGioLE7"
+                      }
+                    },
+                    "object_type": "definition_activity"
+                  },
+                  {
+                    "unique_name": "definition_activity_01C51EDB8F1KS1sxCwyQR20KaEHsxDgz3cq",
+                    "name": "Send Email",
+                    "title": "Send Email",
+                    "type": "email.smtp_send_email",
+                    "base_type": "activity",
+                    "properties": {
+                      "action_timeout": 180,
+                      "body": "$activity.definition_activity_01C50HRQNPV9Q0EvvnESbW9qoXMNBMb5grJ.output.script_queries.name_of_person$",
+                      "continue_on_failure": false,
+                      "display_name": "Send Email",
+                      "from": "bemiles@cisco.com",
+                      "runtime_user": {
+                        "override_target_runtime_user": false,
+                        "target_default": true
+                      },
+                      "skip_execution": false,
+                      "subject": "Found User",
+                      "target": {
+                        "override_workflow_target": true,
+                        "target_id": "definition_target_01C4Y47T3KXQA7CJE1in3pqDTe66fTk5Gpf"
+                      },
+                      "to": "bemiles@cisco.com"
+                    },
+                    "object_type": "definition_activity"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "unique_name": "definition_activity_01C50NN9M36ZM5OIkmqEK6HW30neSQmkxYE",
+            "name": "Condition Branch",
+            "title": "ELSE",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$activity.definition_activity_01C50CRIS6XDT4CC0DZ2DVRgSBykCANrfUo.output.succeeded$",
+                "operator": "eq",
+                "right_operand": false
+              },
+              "continue_on_failure": false,
+              "display_name": "ELSE",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_01C51G8TJ2GFH0aMKjXDDkx6RaPAzIpkenI",
+                "name": "Group",
+                "title": "Did Not Find User",
+                "type": "logic.group",
+                "base_type": "activity",
+                "properties": {
+                  "continue_on_failure": false,
+                  "display_name": "Did Not Find User",
+                  "skip_execution": false
+                },
+                "object_type": "definition_activity",
+                "actions": [
+                  {
+                    "unique_name": "definition_activity_01C51G8UVKB8I66aitKvqf3fB45lEuRn8d0",
+                    "name": "Set Variables",
+                    "title": "Found User",
+                    "type": "core.set_multiple_variables",
+                    "base_type": "activity",
+                    "properties": {
+                      "continue_on_failure": false,
+                      "display_name": "Found User",
+                      "skip_execution": false,
+                      "variables_to_update": [
+                        {
+                          "variable_to_update": "$workflow.definition_workflow_01C50976HFNIA2FgkDQ6vlTdRZgTmIyALjE.local.variable_workflow_01C50RGLWCD390fBOZdVlKFwL8ohsHAVC0r$",
+                          "variable_value_new": "We found $activity.definition_activity_01C50HRQNPV9Q0EvvnESbW9qoXMNBMb5grJ.output.script_queries.name_of_person$ by username."
+                        }
+                      ]
+                    },
+                    "object_type": "definition_activity"
+                  },
+                  {
+                    "unique_name": "definition_activity_01C51G8VEN1AL6rMJ6jqR88n9UtWjULr3Jr",
+                    "name": "Write File",
+                    "title": "Write Results to Windows",
+                    "type": "windows.write_file",
+                    "base_type": "activity",
+                    "properties": {
+                      "action_timeout": 180,
+                      "continue_on_failure": false,
+                      "display_name": "Write Results to Windows",
+                      "encoding": "utf-8",
+                      "file_content": "$workflow.definition_workflow_01C50976HFNIA2FgkDQ6vlTdRZgTmIyALjE.local.variable_workflow_01C50RGLWCD390fBOZdVlKFwL8ohsHAVC0r$",
+                      "file_name_with_path": "e:\\ao\\bemiles-basic-workflow-results.txt",
+                      "options": "AEF",
+                      "runtime_user": {
+                        "override_target_runtime_user": false,
+                        "target_default": true
+                      },
+                      "skip_execution": false,
+                      "target": {
+                        "override_workflow_target": true,
+                        "target_id": "definition_target_01C5136CK5BRM6NoOJxGsxkQCPv63lsVYRr"
+                      }
+                    },
+                    "object_type": "definition_activity"
+                  },
+                  {
+                    "unique_name": "definition_activity_01C51G8VZHS8P6fRMjNva0TCgfjIxJUM3N2",
+                    "name": "Write File",
+                    "title": "Write File to Master Node",
+                    "type": "terminal.write_file",
+                    "base_type": "activity",
+                    "properties": {
+                      "action_timeout": 180,
+                      "continue_on_failure": false,
+                      "display_name": "Write File to Master Node",
+                      "encoding": "utf-8",
+                      "file_name": "/root/bemiles-results.txt",
+                      "options": "append",
+                      "runtime_user": {
+                        "override_target_runtime_user": false,
+                        "target_default": true
+                      },
+                      "skip_execution": false,
+                      "target": {
+                        "override_workflow_target": true,
+                        "target_id": "definition_target_01C51DQGYX5QO0HnyjU6aMfIl2VUzGioLE7"
+                      }
+                    },
+                    "object_type": "definition_activity"
+                  },
+                  {
+                    "unique_name": "definition_activity_01C51G8WK54ZT1MpOQGpR7i9YGfmejzjmsn",
+                    "name": "Send Email",
+                    "title": "Send Email",
+                    "type": "email.smtp_send_email",
+                    "base_type": "activity",
+                    "properties": {
+                      "action_timeout": 180,
+                      "body": "$activity.definition_activity_01C50HRQNPV9Q0EvvnESbW9qoXMNBMb5grJ.output.script_queries.name_of_person$",
+                      "continue_on_failure": false,
+                      "display_name": "Send Email",
+                      "from": "bemiles@cisco.com",
+                      "runtime_user": {
+                        "override_target_runtime_user": false,
+                        "target_default": true
+                      },
+                      "skip_execution": false,
+                      "subject": "Found User",
+                      "target": {
+                        "override_workflow_target": true,
+                        "target_id": "definition_target_01C4Y47T3KXQA7CJE1in3pqDTe66fTk5Gpf"
+                      },
+                      "to": "bemiles@cisco.com"
+                    },
+                    "object_type": "definition_activity"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "category_01C4XY8GPOTG85Eqy8heI3sBY32x1mRcnoV"
+    ]
+  },
+  "categories": {
+    "category_01C4XY8GPOTG85Eqy8heI3sBY32x1mRcnoV": {
+      "unique_name": "category_01C4XY8GPOTG85Eqy8heI3sBY32x1mRcnoV",
+      "name": "bemiles",
+      "title": "bemiles",
+      "type": "basic.category",
+      "base_type": "category",
+      "description": "Ben Workflows",
+      "category_type": "custom",
+      "object_type": "category"
+    }
+  },
+  "targets": {
+    "definition_target_01C4Y1W7QU1SN6jYxIcF6c5EijAXuJRNspD": {
+      "unique_name": "definition_target_01C4Y1W7QU1SN6jYxIcF6c5EijAXuJRNspD",
+      "name": "bemiles-JSONPLACEHOLDER",
+      "title": "bemiles-JSONPLACEHOLDER",
+      "type": "web-service.endpoint",
+      "base_type": "target",
+      "object_type": "definition_target",
+      "properties": {
+        "disable_certificate_validation": true,
+        "display_name": "bemiles-JSONPLACEHOLDER",
+        "host": "jsonplaceholder.typicode.com",
+        "no_runtime_user": true,
+        "protocol": "https"
+      }
+    },
+    "definition_target_01C4Y47T3KXQA7CJE1in3pqDTe66fTk5Gpf": {
+      "unique_name": "definition_target_01C4Y47T3KXQA7CJE1in3pqDTe66fTk5Gpf",
+      "name": "bemiles-outbound.cisco.com",
+      "title": "bemiles-outbound.cisco.com",
+      "type": "email.smtp_endpoint",
+      "base_type": "target",
+      "object_type": "definition_target",
+      "properties": {
+        "default_runtime_user_id": "definition_runtime_user_01C4Y3ZYZMQJP72r97tMZibYd5M3hCx8waF",
+        "display_name": "bemiles-outbound.cisco.com",
+        "no_runtime_user": false,
+        "port": 25,
+        "protocol": "SMTP",
+        "server": "outbound.cisco.com"
+      }
+    },
+    "definition_target_01C5136CK5BRM6NoOJxGsxkQCPv63lsVYRr": {
+      "unique_name": "definition_target_01C5136CK5BRM6NoOJxGsxkQCPv63lsVYRr",
+      "name": "bemiles-CSIT-AUTO-FS",
+      "title": "bemiles-CSIT-AUTO-FS",
+      "type": "windows.endpoint",
+      "base_type": "target",
+      "object_type": "definition_target",
+      "properties": {
+        "default_runtime_user_id": "definition_runtime_user_01C512594NV3V08nrc03keXsBGIPFujnjTq",
+        "display_name": "bemiles-CSIT-AUTO-FS",
+        "host": "CSIT-AUTO-FS.cisco.com",
+        "port": 5985,
+        "protocol": "http"
+      }
+    },
+    "definition_target_01C51DQGYX5QO0HnyjU6aMfIl2VUzGioLE7": {
+      "unique_name": "definition_target_01C51DQGYX5QO0HnyjU6aMfIl2VUzGioLE7",
+      "name": "bemiles-Master",
+      "title": "bemiles-Master",
+      "type": "terminal.unix_linux_endpoint",
+      "base_type": "target",
+      "object_type": "definition_target",
+      "properties": {
+        "bash_shell": "/bin/bash",
+        "default_runtime_user_id": "definition_runtime_user_01C5197337HW350k8qjSyVvvt7mNmVptFhz",
+        "display_name": "bemiles-Master",
+        "host": "10.122.169.178",
+        "port": 22
+      }
+    }
+  },
+  "runtime_users": {
+    "definition_runtime_user_01C4Y3ZYZMQJP72r97tMZibYd5M3hCx8waF": {
+      "unique_name": "definition_runtime_user_01C4Y3ZYZMQJP72r97tMZibYd5M3hCx8waF",
+      "name": "bemiles-email cred for email",
+      "title": "bemiles-email cred for email",
+      "type": "runtime_user.email_credentials",
+      "base_type": "runtime_user",
+      "object_type": "definition_runtime_user",
+      "properties": {
+        "display_name": "bemiles-email cred for email",
+        "password": "*****",
+        "sender": "*****"
+      }
+    },
+    "definition_runtime_user_01C512594NV3V08nrc03keXsBGIPFujnjTq": {
+      "unique_name": "definition_runtime_user_01C512594NV3V08nrc03keXsBGIPFujnjTq",
+      "name": "bemiles-windows admin",
+      "title": "bemiles-windows admin",
+      "type": "runtime_user.windows_credentials",
+      "base_type": "runtime_user",
+      "object_type": "definition_runtime_user",
+      "properties": {
+        "display_name": "bemiles-windows admin",
+        "password": "*****",
+        "username": "*****"
+      }
+    },
+    "definition_runtime_user_01C5197337HW350k8qjSyVvvt7mNmVptFhz": {
+      "unique_name": "definition_runtime_user_01C5197337HW350k8qjSyVvvt7mNmVptFhz",
+      "name": "bemiles-root",
+      "title": "bemiles-root",
+      "type": "runtime_user.terminal_password_credentials",
+      "base_type": "runtime_user",
+      "object_type": "definition_runtime_user",
+      "properties": {
+        "admin_password": "*****",
+        "display_name": "bemiles-root",
+        "password": "*****",
+        "user": "*****"
+      }
+    }
+  },
+  "atomic_workflows": [
+    "definition_workflow_01C4ZMZX0LH1O6E21Xo7QwpAMr1oaOZD9RW"
+  ]
+}
